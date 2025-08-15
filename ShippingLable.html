@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fraktetikett QL-800</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    background: #f0f0f0;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input, textarea {
+    width: 100%;
+    margin-top: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 15px;
+    padding: 8px 15px;
+    cursor: pointer;
+  }
+
+  #labelOutput {
+    display: none;
+    background: white;
+    padding: 2mm;
+    width: 62mm;
+    height: 90mm;
+    box-sizing: border-box;
+    font-size: 9pt;
+    line-height: 1.2em; /* Satır aralığı biraz genişletildi */
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  #labelOutput img {
+    width: 100%;
+    margin-top: 1mm;
+  }
+
+  .section-title {
+    font-weight: bold;
+    margin-top: 1mm;
+    padding: 1mm;
+    background: black;
+    color: white;
+  }
+
+  .divider {
+    border-top: 1px dashed #000;
+    margin: 2px 0 2px 0;
+  }
+
+  #main-title {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0;
+    font-size: 10pt;
+  }
+
+  @media print {
+    @page { margin:0; }
+    body { margin:0; padding:0; }
+    body * { visibility:hidden; }
+    #labelOutput, #labelOutput * { visibility:visible; }
+    #labelOutput {
+      position:absolute;
+      top:0; left:0;
+      width:62mm;
+      height:90mm;
+      padding:2mm;
+      box-sizing:border-box;
+    }
+    form, button { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<h2>Fraktetikett Informasjon</h2>
+<form id="labelForm">
+  <label>Mottaker Navn:</label>
+  <input type="text" id="shipToName" value="John Doe" required />
+
+  <label>Mottaker Adresse:</label>
+  <textarea id="shipToAddress" rows="3" required>123 Main Street, Apt 4B, New York, 10001, USA</textarea>
+
+  <label>Mottaker Telefon:</label>
+  <input type="text" id="shipToPhone" value="+1 555-123-4567" required />
+
+  <label>Avsender Navn:</label>
+  <input type="text" id="fromName" value="WARISJAN TOHTI E-HANDEL" required />
+
+  <label>Avsender Adresse:</label>
+  <textarea id="fromAddress" rows="2" required>Værlegata 10, 1531 Moss</textarea>
+
+  <label>Ordre ID:</label>
+  <input type="text" id="orderId" value="123456789" required />
+
+ <label>Kolli Størrelse:</label>
+<select id="dimensions" required>
+  <option value="25x20x10 cm">Liten Kasse (25 × 20 × 10 cm)</option>
+  <option value="35x25x15 cm">Mellom Kasse (35 × 25 × 15 cm)</option>
+  <option value="45x35x20 cm">Stor Kasse (45 × 35 × 20 cm)</option>
+  <option value="60x40x25 cm">Ekstra Stor Kasse (60 × 40 × 25 cm)</option>
+</select>
+
+  <label>Vekt:</label>
+  <input type="text" id="weight" value="2.5 KG" required />
+
+  <label>Notater:</label>
+  <textarea id="remarks" rows="2">Ingen bemerkninger</textarea>
+
+  <label>Trackingkode:</label>
+  <input type="text" id="trackingCode" value="TRACK123456789US" required />
+
+  <button type="button" onclick="generateLabel()">Lag Etikett</button>
+</form>
+
+<div id="labelOutput"></div>
+
+<script>
+function generateLabel() {
+  const shipToName = document.getElementById('shipToName').value;
+  const shipToAddress = document.getElementById('shipToAddress').value;
+  const shipToPhone = document.getElementById('shipToPhone').value;
+  const fromName = document.getElementById('fromName').value;
+  const fromAddress = document.getElementById('fromAddress').value;
+  const orderId = document.getElementById('orderId').value;
+  const dimensions = document.getElementById('dimensions').value;
+  const weight = document.getElementById('weight').value;
+  const remarks = document.getElementById('remarks').value;
+  const trackingCode = document.getElementById('trackingCode').value;
+
+  const labelHtml = `
+<div id="main-title">WARISJAN TOHTI E-HANDEL</div>
+
+<div class="section-title">TIL:</div>
+${shipToName}<br>
+${shipToAddress}<br>
+Telefon: ${shipToPhone}
+
+<div class="divider"></div>
+
+<div class="section-title">FRA:</div>
+${fromName}<br>
+${fromAddress}
+
+
+
+<div class="divider"></div> <!-- Kesik çizgi üstü ORDRE ID için -->
+ORDRE ID: ${orderId}<br>
+KOLLI: ${dimensions}<br>
+VEKT: ${weight}<br>
+
+<div class="divider"></div>
+
+NOTATER:<br>
+${remarks}<br>
+<div class="divider"></div> <!-- Kesik çizgi üstü ORDRE ID için -->
+<span style="display:block; text-align:center;">${trackingCode}</span>
+`;
+
+  const output = document.getElementById('labelOutput');
+  output.innerHTML = labelHtml + `<img src="https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(trackingCode)}&code=Code128&translate-esc=true" alt="Barcode">`;
+  output.style.display = 'block';
+
+  document.getElementById('labelForm').style.display = 'none';
+
+  setTimeout(() => window.print(), 300);
+  setTimeout(() => location.reload(), 2000);
+}
+</script>
+
+</body>
+</html>
