@@ -1,2 +1,1 @@
 #ShippingLable
-# python-daily-notes
